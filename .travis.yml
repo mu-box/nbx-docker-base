@@ -1,0 +1,30 @@
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - docker build -t nbx/base .
+  - sudo apt-get -y install python-pip
+  - sudo pip install docker-squash
+
+script: sudo tests/run.sh
+
+after_success:
+  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - docker build -t ${NAMESPACE}/base .
+  - docker-squash -t ${NAMESPACE}/base:squashed --tmp-dir /var/tmp/squasher ${NAMESPACE}/base
+  - docker tag ${NAMESPACE}/base:squashed ${NAMESPACE}/base:beta
+  - docker push ${REMOTE}${NAMESPACE}/base:beta
+  - |
+    if [ "$BRANCH" == "master" ]; then
+      docker tag ${NAMESPACE}/base:squashed ${NAMESPACE}/base
+      docker push ${REMOTE}${NAMESPACE}/base
+      # curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" \
+      #      -H "Authorization: token ${TRAVIS_TOKEN}" -d "{\"request\":{\"branch\":\"master\"}}" \
+      #      https://api.travis-ci.org/repo/nanobox-io%2Fnbx-docker-runit/requests
+    else
+      docker tag ${NAMESPACE}/base:squashed ${NAMESPACE}/base:${BRANCH//\//_}
+      docker push ${REMOTE}${NAMESPACE}/base:${BRANCH//\//_}
+    fi
