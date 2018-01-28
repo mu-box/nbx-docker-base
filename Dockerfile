@@ -27,7 +27,8 @@ RUN apt-get update -qq && \
     apt-get clean all
 
 # Install pkgsrc "gonano" bootstrap
-RUN curl -s ${PKGSRC_BASEURL}/${PKGSRC_GONANO}/bootstrap.tar.gz | tar -C / -zxf - && \
+RUN set -o pipefail && \
+    curl -s ${PKGSRC_BASEURL}/${PKGSRC_GONANO}/bootstrap.tar.gz | tar -C / -zxf - && \
     echo "${PKGSRC_BASEURL}/${PKGSRC_GONANO}" > /opt/gonano/etc/pkgin/repositories.conf && \
     /opt/gonano/sbin/pkg_admin rebuild && \
     rm -rf /var/gonano/db/pkgin && \
@@ -42,7 +43,8 @@ RUN curl -s ${PKGSRC_BASEURL}/${PKGSRC_GONANO}/bootstrap.tar.gz | tar -C / -zxf 
 ENV PATH /opt/gonano/sbin:/opt/gonano/bin:$PATH
 
 # install pkgsrc "base" bootstrap
-RUN curl -s ${PKGSRC_BASEURL}/${PKGSRC_MAIN}/bootstrap.tar.gz | tar -C / -zxf - && \
+RUN set -o pipefail && \
+    curl -s ${PKGSRC_BASEURL}/${PKGSRC_MAIN}/bootstrap.tar.gz | tar -C / -zxf - && \
     echo "${PKGSRC_BASEURL}/${PKGSRC_MAIN}" > /data/etc/pkgin/repositories.conf && \
     /data/sbin/pkg_admin rebuild && \
     rm -rf /data/var/db/pkgin && \
@@ -59,7 +61,7 @@ RUN mkdir -p /data/var/home && \
     passwd -u gonano
 
 # Copy files
-COPY files/. /
+COPY files/base/. /
 
 # Own all gonano files
 RUN chown -R gonano:gonano /data

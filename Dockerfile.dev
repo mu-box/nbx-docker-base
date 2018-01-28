@@ -1,0 +1,45 @@
+# nbx/dev
+#
+# VERSION               0.1.0
+
+FROM nbx/base
+
+LABEL name="nbx/dev" version="0.1.0" \
+      description="The base for all official Nanobox Docker dev images. Most users will want to use a different nbx/*-dev image in their projects."
+
+# install gcc and build tools and other utilities
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends \
+      iptables build-essential git rsync openssh-client pv netcat gfortran && \
+    apt-get clean all && \
+    rm -rf /var/lib/apt/lists/*
+
+# install other tools required for engine
+RUN rm -rf /var/gonano/db/pkgin && /opt/gonano/bin/pkgin -y up && \
+    /opt/gonano/bin/pkgin -y in shon mustache ctime && \
+    rm -rf /var/gonano/db/pkgin/cache && \
+    gem install ya2yaml --no-ri --no-rdoc
+
+# Copy files
+COPY files/dev/. /
+
+# chown the gonano directory
+RUN chown -R gonano:gonano /data
+
+# add temporary scripts
+COPY scripts/. /var/tmp/
+
+# generate build exclude list
+RUN /var/tmp/generate-build-excludes
+
+# update pkgin remote packages
+RUN rm -rf /data/var/db/pkgin && /data/bin/pkgin -y up && \
+    rm -rf /data/var/db/pkgin/cache && \
+    chown -R gonano /data/var/db/pkgin
+
+RUN mkdir /app && chown gonano:gonano /app
+
+# Cleanup disk
+RUN rm -rf /tmp/* /var/tmp/*
+
+WORKDIR /app
