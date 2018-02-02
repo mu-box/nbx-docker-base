@@ -22,7 +22,20 @@ RUN mkdir -p \
 
 # Install curl and wget
 RUN apt-get update -qq && \
-    apt-get install -y curl wget vim nano sudo net-tools netcat iproute iputils-ping netbase locales tzdata && \
+    apt-get install -y \
+            curl \
+            iproute \
+            iputils-ping \
+            locales \
+            nano \
+            net-tools \
+            netbase \
+            netcat \
+            sudo \
+            tzdata \
+            vim \
+            wget \
+        && \
     apt-get dist-upgrade --auto-remove -y && \
     apt-get clean all
 
@@ -33,14 +46,15 @@ RUN set -o pipefail && \
     /opt/gonano/sbin/pkg_admin rebuild && \
     rm -rf /var/gonano/db/pkgin && \
     /opt/gonano/bin/pkgin -y up && \
-    /opt/gonano/bin/pkgin -y in siphon && \
+    /opt/gonano/bin/pkgin -yV in \
+            narc \
+            openssh \
+            siphon \
+        && \
     rm -rf \
       /var/gonano/db/pkgin \
       /opt/gonano/share/{doc,ri,examples} \
       /opt/gonano/man
-
-# add gonano binaries on path
-ENV PATH /opt/gonano/sbin:/opt/gonano/bin:$PATH
 
 # install pkgsrc "base" bootstrap
 RUN set -o pipefail && \
@@ -53,6 +67,9 @@ RUN set -o pipefail && \
       /data/var/db/pkgin \
       /data/share/{doc,ri,examples} \
       /data/man
+
+# add gonano binaries on path
+ENV PATH /data/sbin:/data/bin:/opt/gonano/sbin:/opt/gonano/bin:$PATH
 
 # Add gonano user
 RUN mkdir -p /data/var/home && \
@@ -82,6 +99,6 @@ ENV TERM xterm
 
 # Cleanup disk
 RUN rm -rf \
-      /var/lib/apt/lists/* \
-      /tmp/* \
-      /var/tmp/*
+    /var/lib/apt/lists/* \
+    /tmp/* \
+    /var/tmp/*

@@ -15,10 +15,17 @@ RUN mkdir -p \
 
 # Install nfs client
 RUN apt-get update -qq && \
-    apt-get install -y nfs-common cron libgfortran3 libgomp1 ruby && \
+    apt-get install -y \
+            cron \
+            libgfortran3 \
+            libgomp1 \
+            nfs-common \
+            ruby \
+        && \
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/*
 
-RUN gem install remote_syslog_logger
+RUN gem install --no-ri --no-rdoc \
+            remote_syslog_logger
 
 WORKDIR /app

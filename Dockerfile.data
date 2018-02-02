@@ -1,0 +1,37 @@
+# nbx/data
+#
+# VERSION               0.1.0
+
+FROM nbx/base
+
+LABEL name="nbx/data" version="0.1.0" \
+      description="The base for all official Nanobox Docker data images. Most users will want to use a different nbx/* image, which extends this one, in their own projects."
+
+# Install pkgin packages
+RUN rm -rf /var/gonano/db/pkgin && /opt/gonano/bin/pkgin -y up && \
+    /opt/gonano/bin/pkgin -yV in \
+            nanoinit \
+            runit \
+        && \
+    rm -rf /var/gonano/db/pkgin/cache
+
+# copy files
+COPY scripts/. /var/tmp/
+
+# setup runit
+RUN mkdir -p /etc/service
+RUN ln -s /etc/service /service
+
+# prepare docker init process
+RUN /var/tmp/prepare-docker-init
+
+# Cleanup disk
+RUN rm -rf \
+    /var/lib/apt/lists/* \
+    /tmp/* \
+    /var/tmp/*
+
+WORKDIR /data
+
+# Run runit automatically
+CMD ["/opt/gonano/bin/nanoinit"]

@@ -10,15 +10,28 @@ LABEL name="nbx/dev" version="0.1.0" \
 # install gcc and build tools and other utilities
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
-      iptables build-essential git rsync openssh-client pv netcat gfortran && \
+            build-essential \
+            gfortran \
+            git \
+            iptables \
+            netcat \
+            openssh-client \
+            pv \
+            rsync \
+        && \
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/*
 
 # install other tools required for engine
 RUN rm -rf /var/gonano/db/pkgin && /opt/gonano/bin/pkgin -y up && \
-    /opt/gonano/bin/pkgin -y in shon mustache ctime && \
+    /opt/gonano/bin/pkgin -yV in \
+            ctime \
+            mustache \
+            shon \
+        && \
     rm -rf /var/gonano/db/pkgin/cache && \
-    gem install ya2yaml --no-ri --no-rdoc
+    gem install --no-ri --no-rdoc \
+            ya2yaml
 
 # Copy files
 COPY files/dev/. /
@@ -40,6 +53,9 @@ RUN rm -rf /data/var/db/pkgin && /data/bin/pkgin -y up && \
 RUN mkdir /app && chown gonano:gonano /app
 
 # Cleanup disk
-RUN rm -rf /tmp/* /var/tmp/*
+RUN rm -rf \
+    /var/lib/apt/lists/* \
+    /tmp/* \
+    /var/tmp/*
 
 WORKDIR /app
