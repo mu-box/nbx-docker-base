@@ -6,28 +6,23 @@ services:
 language: c
 
 before_install:
-  - docker build -t nbx/base -f Dockerfile .
-  - |
-    for stack in {dev,live,data}
-    do
-      docker build -t nbx/${stack} -f Dockerfile.${stack} .
-    done
-  - sudo apt-get -y install python-pip
-  - sudo pip install docker-squash
+  - ./build.sh
+  - sudo apt-get -y install python3-pip
+  - sudo pip3 install docker-squash "docker<3.0.0"
 
 script: sudo tests/run.sh
 
 after_success:
   - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
-  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
   # Squash, then push, *:beta
   - |
-    for stack in {base,dev,live,data}
+    for stack in {base,data}
     do
-      docker-squash -t ${NAMESPACE}/${stack}:squashed --tmp-dir /var/tmp/squasher nbx/${stack}
-      docker tag ${NAMESPACE}/${stack}:squashed ${NAMESPACE}/${stack}:beta
-      docker push ${REMOTE}${NAMESPACE}/${stack}:beta
+      docker-squash -t ${NAMESPACE}${stack}:squashed --tmp-dir /var/tmp/squasher nanobox/nbx-${stack}
+      docker tag ${NAMESPACE}${stack}:squashed ${NAMESPACE}${stack}:beta
+      docker push ${REMOTE}${NAMESPACE}${stack}:beta
     done
 
   # Push *:$BRANCH, or *:latest if master
@@ -38,8 +33,8 @@ after_success:
       tag="${BRANCH//\//_}"
     fi
 
-    for stack in {base,dev,live,data}
+    for stack in {base,data}
     do
-      docker tag ${NAMESPACE}/${stack}:squashed ${NAMESPACE}/${stack}:${tag}
-      docker push ${REMOTE}${NAMESPACE}/${stack}:${tag}
+      docker tag ${NAMESPACE}${stack}:squashed ${NAMESPACE}${stack}:${tag}
+      docker push ${REMOTE}${NAMESPACE}${stack}:${tag}
     done

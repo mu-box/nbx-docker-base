@@ -1,4 +1,4 @@
-# nbx/base
+# nanobox/nbx-base
 #
 # VERSION               0.1.0
 
@@ -8,8 +8,8 @@ ARG PKGSRC_BASEURL=http://d7zr21m3kwv6q.cloudfront.net
 ARG PKGSRC_GONANO=nanobox/gonano/Linux
 ARG PKGSRC_MAIN=2017/11/nanobox/base/Linux
 
-LABEL name="nbx/base" version="0.1.0" maintainer="Nanobox, Inc" \
-      description="The base for all official Nanobox Docker images. Most users will want to use a different nbx/* image in their projects."
+LABEL name="nanobox/nbx-base" version="0.1.0" maintainer="Nanobox, Inc" \
+      description="The base for all official Nanobox Docker images. Most users will want to use a different nanobox/nbx-* image in their projects."
 
 SHELL ["/bin/bash", "-c"]
 
@@ -47,8 +47,10 @@ RUN set -o pipefail && \
     rm -rf /var/gonano/db/pkgin && \
     /opt/gonano/bin/pkgin -y up && \
     /opt/gonano/bin/pkgin -yV in \
+            mustache \
             narc \
             openssh \
+            shon \
             siphon \
         && \
     rm -rf \

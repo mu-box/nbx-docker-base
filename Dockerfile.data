@@ -1,11 +1,11 @@
-# nbx/data
+# nanobox/nbx-data
 #
 # VERSION               0.1.0
 
-FROM nbx/base
+FROM nanobox/nbx-base
 
-LABEL name="nbx/data" version="0.1.0" \
-      description="The base for all official Nanobox Docker data images. Most users will want to use a different nbx/* image, which extends this one, in their own projects."
+LABEL name="nanobox/nbx-data" version="0.1.0" \
+      description="The base for all official Nanobox Docker data images. Most users will want to use a different nanobox/nbx-* image, which extends this one, in their own projects."
 
 # Install pkgin packages
 RUN rm -rf /var/gonano/db/pkgin && /opt/gonano/bin/pkgin -y up && \
