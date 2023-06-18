@@ -1,5 +1,5 @@
 # nbx-docker-base
-The base for all official Nanobox Docker images.
+The base for all official Microbox Docker images.
 
 ## Usage
 

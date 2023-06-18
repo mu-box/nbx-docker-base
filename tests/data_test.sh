@@ -1,5 +1,5 @@
 UUID=$(cat /proc/sys/kernel/random/uuid)
-pass "unable to start the container" docker run -d --name $UUID nanobox/nbx-data
+pass "unable to start the container" docker run -d --name $UUID mubox/nbx-data
 defer docker stop $UUID
 defer docker rm $UUID
 

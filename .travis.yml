@@ -20,7 +20,7 @@ after_success:
   - |
     for stack in {base,data}
     do
-      docker-squash -t ${NAMESPACE}${stack}:squashed --tmp-dir /var/tmp/squasher nanobox/nbx-${stack}
+      docker-squash -t ${NAMESPACE}${stack}:squashed --tmp-dir /var/tmp/squasher mubox/nbx-${stack}
       docker tag ${NAMESPACE}${stack}:squashed ${NAMESPACE}${stack}:beta
       docker push ${REMOTE}${NAMESPACE}${stack}:beta
     done

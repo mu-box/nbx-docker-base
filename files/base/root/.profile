@@ -12,4 +12,4 @@ if [ "$PS1" ]; then
   PS2="${RED}> ${RESET}"
 fi
 
-export PATH=$PATH:/opt/gonano/sbin:/opt/gonano/bin:/data/sbin:/data/bin
+export PATH=$PATH:/opt/gomicro/sbin:/opt/gomicro/bin:/data/sbin:/data/bin

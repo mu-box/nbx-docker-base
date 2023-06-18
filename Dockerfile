@@ -1,24 +1,24 @@
-# nanobox/nbx-base
+# mubox/nbx-base
 #
 # VERSION               0.1.0
 
 FROM ubuntu
 
-ARG PKGSRC_BASEURL=http://d7zr21m3kwv6q.cloudfront.net
-ARG PKGSRC_GONANO=nanobox/gonano/Linux
-ARG PKGSRC_MAIN=2017/11/nanobox/base/Linux
+ARG PKGSRC_BASEURL=http://s3.amazonaws.com/tools.microbox.cloud
+ARG PKGSRC_GOMICRO=mubox/gomicro/Linux
+ARG PKGSRC_MAIN=2017/11/microbox/base/Linux
 
-LABEL name="nanobox/nbx-base" version="0.1.0" maintainer="Nanobox, Inc" \
-      description="The base for all official Nanobox Docker images. Most users will want to use a different nanobox/nbx-* image in their projects."
+LABEL name="mubox/nbx-base" version="0.1.0" maintainer="The Microbox Team" \
+      description="The base for all official Microbox Docker images. Most users will want to use a different mubox/nbx-* image in their projects."
 
 SHELL ["/bin/bash", "-c"]
 
 # Create needed directories
 RUN mkdir -p \
       /etc/environment.d \
-      /var/gonano/{db,run} \
+      /var/gomicro/{db,run} \
       /data/var/db \
-      /var/nanobox
+      /var/microbox
 
 # Install curl and wget
 RUN apt-get update -qq && \
@@ -39,14 +39,14 @@ RUN apt-get update -qq && \
     apt-get dist-upgrade --auto-remove -y && \
     apt-get clean all
 
-# Install pkgsrc "gonano" bootstrap
+# Install pkgsrc "gomicro" bootstrap
 RUN set -o pipefail && \
-    curl -s ${PKGSRC_BASEURL}/${PKGSRC_GONANO}/bootstrap.tar.gz | tar -C / -zxf - && \
-    echo "${PKGSRC_BASEURL}/${PKGSRC_GONANO}" > /opt/gonano/etc/pkgin/repositories.conf && \
-    /opt/gonano/sbin/pkg_admin rebuild && \
-    rm -rf /var/gonano/db/pkgin && \
-    /opt/gonano/bin/pkgin -y up && \
-    /opt/gonano/bin/pkgin -yV in \
+    curl -s ${PKGSRC_BASEURL}/${PKGSRC_GOMICRO}/bootstrap.tar.gz | tar -C / -zxf - && \
+    echo "${PKGSRC_BASEURL}/${PKGSRC_GOMICRO}" > /opt/gomicro/etc/pkgin/repositories.conf && \
+    /opt/gomicro/sbin/pkg_admin rebuild && \
+    rm -rf /var/gomicro/db/pkgin && \
+    /opt/gomicro/bin/pkgin -y up && \
+    /opt/gomicro/bin/pkgin -yV in \
             mustache \
             narc \
             openssh \
@@ -54,9 +54,9 @@ RUN set -o pipefail && \
             siphon \
         && \
     rm -rf \
-      /var/gonano/db/pkgin \
-      /opt/gonano/share/{doc,ri,examples} \
-      /opt/gonano/man
+      /var/gomicro/db/pkgin \
+      /opt/gomicro/share/{doc,ri,examples} \
+      /opt/gomicro/man
 
 # install pkgsrc "base" bootstrap
 RUN set -o pipefail && \
@@ -70,20 +70,20 @@ RUN set -o pipefail && \
       /data/share/{doc,ri,examples} \
       /data/man
 
-# add gonano binaries on path
-ENV PATH /data/sbin:/data/bin:/opt/gonano/sbin:/opt/gonano/bin:$PATH
+# add gomicro binaries on path
+ENV PATH /data/sbin:/data/bin:/opt/gomicro/sbin:/opt/gomicro/bin:$PATH
 
-# Add gonano user
+# Add gomicro user
 RUN mkdir -p /data/var/home && \
-    groupadd gonano && \
-    useradd -m -s '/bin/bash' -p `openssl passwd -1 gonano` -g gonano -d /data/var/home/gonano gonano && \
-    passwd -u gonano
+    groupadd gomicro && \
+    useradd -m -s '/bin/bash' -p `openssl passwd -1 gomicro` -g gomicro -d /data/var/home/gomicro gomicro && \
+    passwd -u gomicro
 
 # Copy files
 COPY files/base/. /
 
-# Own all gonano files
-RUN chown -R gonano:gonano /data
+# Own all gomicro files
+RUN chown -R gomicro:gomicro /data
 
 # Set Permissions on the /root folder and /root/.ssh folder
 RUN mkdir -p /root/.ssh && \

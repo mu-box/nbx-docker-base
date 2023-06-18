@@ -44,8 +44,8 @@ if [ -d /data ]; then
   export PATH=${PATH}/data/sbin:/data/bin:
 fi
 
-# prefix ubuntu defaults with the gonano pkgsrc bootstrap
-export PATH=${PATH}/opt/gonano/sbin:/opt/gonano/bin
+# prefix ubuntu defaults with the gomicro pkgsrc bootstrap
+export PATH=${PATH}/opt/gomicro/sbin:/opt/gomicro/bin
 
 # set the ubuntu defaults
 export PATH=${PATH}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
